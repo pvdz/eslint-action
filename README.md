@@ -1,23 +1,11 @@
-# ESLint Action
+# Inline ESLint
 
-This is a GitHub Action that runs ESLint for `.js`, `.jsx`, and `.tsx` files using your `.eslintrc` rules. It's free to run and it'll annotate the diffs of your pull requests with lint errors and warnings.
+This Github Action runs ESLint on Gatsby and reports errors inline in any PR.
 
-![](screenshots/annotation.png)
+## Updating
 
-Neat! Bet your CI doesn't do that.
+Since we are running in a mono-repo changes will need to be made in two steps (no publishing is required).
 
-## Usage
+The first commit to master is to update the Action code. The second commit is to update the location of the action (which requires the specific commit hash to use).
 
-`.github/main.workflow`:
-
-```hcl
-workflow "Pull Request" {
-  on = "pull_request"
-  resolves = ["ESLint"]
-}
-
-action "ESLint" {
-  uses = "hallee/eslint-action@master"
-  secrets = ["GITHUB_TOKEN"]
-}
-```
+To test changes in a PR, fork the repo and point gatsby/.github/workflows/lint.yml to your Gatsby PR branch to your fork. That should cover it.

@@ -1,9 +1,9 @@
 FROM node:10-slim
 
-LABEL com.github.actions.name="ESLint Action"
-LABEL com.github.actions.description="Lint your Javascript projects with inline lint error annotations on pull requests."
+LABEL com.github.actions.name="Gatsby Lint Reporter"
+LABEL com.github.actions.description="Reports lint errors inline in PRs"
 LABEL com.github.actions.icon="code"
 LABEL com.github.actions.color="yellow"
 
-COPY lib /action/lib
+COPY src /action/src
 ENTRYPOINT ["/action/lib/entrypoint.sh"]

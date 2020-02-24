@@ -19,19 +19,15 @@ const checkName = 'Display lint in PR'
 
 const headers = {
   'Content-Type': 'application/json',
-  Accept: 'application/vnd.github.antiope-preview+json',
+  Accept: 'application/json',
   Authorization: `Bearer ${GITHUB_TOKEN}`,
   'User-Agent': 'eslint-action'
 }
-
 
 function runEslint() {
   const eslint = require('eslint')
 
   console.log('Running eslint now ...');
-
-  // There is no "quiet" option here and getting a config is too much work
-  // so we just suppress the warnings.
 
   const cli = new eslint.CLIEngine({
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
@@ -46,6 +42,7 @@ function runEslint() {
   // fixableErrorCount, fixableWarningCount are available too
   const { results, errorCount, warningCount } = report
 
+  console.log('Finished eslint');
   console.log('Found', errorCount, 'errors (and', warningCount, 'warnings)');
   console.log('Marking action as', errorCount > 0 ? 'failure due to error count' : 'success');
 
@@ -54,6 +51,9 @@ function runEslint() {
     'warning',
     'failure'
   ]
+
+  // There is no "quiet" option for CLIEngine and getting a config is too
+  // much work so we just filter the warnings here.
 
   const annotations = []
   for (const result of results) {
