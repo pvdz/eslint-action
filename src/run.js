@@ -26,6 +26,8 @@ const headers = {
   "User-Agent": "eslint-reporter",
 }
 
+console.log('accept=',headers.Accept);
+
 function runEslint() {
   const eslint = require("eslint")
 
