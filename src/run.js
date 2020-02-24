@@ -1,4 +1,4 @@
-const request = require('./request')
+const request = require("./request")
 
 const { GITHUB_EVENT_PATH, GITHUB_TOKEN, GITHUB_WORKSPACE } = process.env
 const event = require(GITHUB_EVENT_PATH)
@@ -15,42 +15,40 @@ const { name: repo } = repository
 //   event
 // })
 
-const checkName = 'Display lint in PR'
+const checkName = "Display lint in PR"
 
 const headers = {
-  'Content-Type': 'application/json',
-  Accept: 'application/json',
+  "Content-Type": "application/json",
+  Accept: "application/json",
   Authorization: `Bearer ${GITHUB_TOKEN}`,
-  'User-Agent': 'eslint-action'
+  "User-Agent": "eslint-reporter",
 }
 
 function runEslint() {
-  const eslint = require('eslint')
+  const eslint = require("eslint")
 
-  console.log('Running eslint now ...');
+  console.log("Running eslint now ...")
 
   const cli = new eslint.CLIEngine({
-    extensions: ['.js', '.jsx', '.ts', '.tsx'],
-
+    extensions: [".js", ".jsx", ".ts", ".tsx"],
     // Dedupe messages between eslint/prettier/TS (ever growing list)
     rules: {
-      '@typescript-eslint/quotes': 0,
+      "@typescript-eslint/quotes": 0,
     },
   })
-  const report = cli.executeOnFiles(['.'])
+  const report = cli.executeOnFiles(["."])
 
   // fixableErrorCount, fixableWarningCount are available too
   const { results, errorCount, warningCount } = report
 
-  console.log('Finished eslint');
-  console.log('Found', errorCount, 'errors (and', warningCount, 'warnings)');
-  console.log('Marking action as', errorCount > 0 ? 'failure due to error count' : 'success');
+  console.log("Finished eslint")
+  console.log("Found", errorCount, "errors (and", warningCount, "warnings)")
+  console.log(
+    "Marking action as",
+    errorCount > 0 ? "failure due to error count" : "success"
+  )
 
-  const levels = [
-    '',
-    'warning',
-    'failure'
-  ]
+  const levels = ["", "warning", "failure"]
 
   // There is no "quiet" option for CLIEngine and getting a config is too
   // much work so we just filter the warnings here.
@@ -62,25 +60,25 @@ function runEslint() {
     for (const msg of messages) {
       const { line, severity, ruleId, message } = msg
       const annotationLevel = levels[severity]
-      if (annotationLevel === 'failure') {
+      if (annotationLevel === "failure") {
         annotations.push({
           path,
           start_line: line,
           end_line: line,
           annotation_level: annotationLevel,
-          message: `[${ruleId}] ${message}`
+          message: `[${ruleId}] ${message}`,
         })
       }
     }
   }
 
   return {
-    conclusion: errorCount > 0 ? 'failure' : 'success',
+    conclusion: errorCount > 0 ? "failure" : "success",
     output: {
       title: checkName,
       summary: `${errorCount} error(s) (and ${warningCount} warnings) found`,
-      annotations
-    }
+      annotations,
+    },
   }
 }
 
@@ -88,15 +86,20 @@ async function startAction() {
   const body = {
     name: checkName,
     head_sha: actualSHA,
-    status: 'in_progress',
-    started_at: new Date()
+    status: "in_progress",
+    started_at: new Date(),
   }
 
-  const { data: { id } } = await request(`https://api.github.com/repos/${owner}/${repo}/check-runs`, {
-    method: 'POST',
-    headers,
-    body
-  })
+  const {
+    data: { id },
+  } = await request(
+    `https://api.github.com/repos/${owner}/${repo}/check-runs`,
+    {
+      method: "POST",
+      headers,
+      body,
+    }
+  )
 
   return id
 }
@@ -105,21 +108,24 @@ async function completeAction(id, conclusion, output) {
   const body = {
     name: checkName,
     head_sha: actualSHA,
-    status: 'completed',
+    status: "completed",
     completed_at: new Date(),
     conclusion,
-    output
+    output,
   }
 
-  await request(`https://api.github.com/repos/${owner}/${repo}/check-runs/${id}`, {
-    method: 'PATCH',
-    headers,
-    body
-  })
+  await request(
+    `https://api.github.com/repos/${owner}/${repo}/check-runs/${id}`,
+    {
+      method: "PATCH",
+      headers,
+      body,
+    }
+  )
 }
 
 function exitWithError(err) {
-  console.error('Error', err.stack)
+  console.error("Error", err.stack)
   if (err.data) {
     console.error(err.data)
   }
@@ -132,11 +138,11 @@ async function run() {
     const { conclusion, output } = runEslint()
 
     await completeAction(id, conclusion, output)
-    if (conclusion === 'failure') {
+    if (conclusion === "failure") {
       process.exit(78)
     }
   } catch (err) {
-    await completeAction(id, 'failure')
+    await completeAction(id, "failure")
     exitWithError(err)
   }
 }

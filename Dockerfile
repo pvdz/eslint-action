@@ -6,4 +6,4 @@ LABEL com.github.actions.icon="code"
 LABEL com.github.actions.color="yellow"
 
 COPY src /action/src
-ENTRYPOINT ["/action/lib/entrypoint.sh"]
+ENTRYPOINT ["/action/src/entrypoint.sh"]
