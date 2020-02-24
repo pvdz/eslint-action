@@ -19,7 +19,9 @@ const checkName = "Display lint in PR"
 
 const headers = {
   "Content-Type": "application/json",
-  Accept: "application/json",
+  // As per the note at https://developer.github.com/v3/checks/runs/#create-a-check-run
+  // The Accept type must be set to a custom vnd.github.antiope-preview+json
+  Accept: "application/vnd.github.antiope-preview+json",
   Authorization: `Bearer ${GITHUB_TOKEN}`,
   "User-Agent": "eslint-reporter",
 }
